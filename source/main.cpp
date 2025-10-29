@@ -2,6 +2,8 @@
 
 void update();
 void update_loop();
+void calculate_expensive_value();
+volatile double *memory_expensive_fn();
 
 int main()
 {
@@ -19,20 +21,61 @@ int main()
 
 void update()
 {
-    volatile double result = 0.0; // volatile prevents optimization
+    // calculate_expensive_value();
+}
 
-    const auto working_limit = 5000; // 50000
+/**
+ * Arbitrary code designed to simulate an expensive calculation.
+ * Run by multiple threads at once.
+ */
+void calculate_expensive_value()
+{
+    volatile double *arbitrary_filled_array = memory_expensive_fn();
+
+    volatile double dst = 0.0;
+    const auto working_limit = 10; // 25
     for (auto i = 0; i < working_limit; ++i)
     {
-        result += std::sin(i) * std::cos(i) * std::tan(i % 360);
+        dst += std::sin(i) * std::cos(i) * std::tan(i % 360) + arbitrary_filled_array[i];
     }
+    dst /= 3.3;
+    free(const_cast<double *>(arbitrary_filled_array));
+}
+
+
+/**
+* Allocate a 2 large arrays, fill them, copy to each other, free, etc.
+* Called by calculate_expensive_value above.
+*/
+volatile double *memory_expensive_fn()
+{
+    const size_t nums = 2000;
+    volatile double *src = static_cast<volatile double *>(malloc(nums * sizeof(double)));
+
+    for (size_t i = 0; i < nums; i++)
+        src[i] = 0.0;
+
+    for (size_t i = 0; i < nums; i += 2)
+    {
+        *src = i * 3.3;
+    }
+
+    volatile double *dst = static_cast<volatile double *>(malloc(nums * sizeof(double)));
+    memcpy(const_cast<double *>(dst), const_cast<double*>(src), nums * sizeof(double));
+
+    free(const_cast<double *>(src));
+    return dst;
 }
 
 void update_loop()
 {
+    const size_t num_fibers_calculating_expensive_value = 8;
     while (1)
     {
         fiber_sleep(UPDATE_PRIORITY);
-        update();
+        for (size_t i = 0; i < num_fibers_calculating_expensive_value; i++)
+        {
+            create_fiber(calculate_expensive_value);
+        }
     }
 }
