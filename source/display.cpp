@@ -37,7 +37,7 @@ void fill(uint8_t color)
 
 void fill_display_loop()
 {
-    uint8_t colour = 0;
+    uint8_t colour = 2;
     while (1)
     {
         fiber_sleep(RENDER_PRIORITY);
