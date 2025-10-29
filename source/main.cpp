@@ -49,7 +49,8 @@ void calculate_expensive_value()
 */
 volatile double *memory_expensive_fn()
 {
-    const size_t nums = 800;
+    // const size_t nums = 800;
+    const size_t nums = 820;
     volatile double *src = static_cast<volatile double *>(malloc(nums * sizeof(double)));
 
     for (size_t i = 0; i < nums; i++)

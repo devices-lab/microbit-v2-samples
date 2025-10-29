@@ -57,6 +57,7 @@ void update_display()
 {
     if (updated)
     {
+        DMESG("W");
         buffer_lock.wait();
         lcd->waitForSendDone();
 
@@ -64,6 +65,7 @@ void update_display()
         lcd->sendIndexedImage(buffers[1], ST7735_WIDTH, ST7735_HEIGHT, palette);
 
         updated = false;
+        DMESG("N");
         buffer_lock.notify();
     }
 }
