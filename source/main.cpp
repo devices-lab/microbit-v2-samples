@@ -50,7 +50,7 @@ void calculate_expensive_value()
 volatile double *memory_expensive_fn()
 {
     // const size_t nums = 800;
-    const size_t nums = 1000;
+    const size_t nums = 1100;
     volatile double *src = static_cast<volatile double *>(malloc(nums * sizeof(double)));
 
     for (size_t i = 0; i < nums; i++)
@@ -70,7 +70,7 @@ volatile double *memory_expensive_fn()
 
 void update_loop()
 {
-    const size_t num_fibers_calculating_expensive_value = 8; // 6 should prevent hanging
+    const size_t num_fibers_calculating_expensive_value = 10; // 6 should prevent hanging
     while (1)
     {
         fiber_sleep(UPDATE_PRIORITY);

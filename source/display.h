@@ -18,6 +18,7 @@
 #define INPUT_PRIORITY 10
 /** Draw stuff on the screen. */
 #define RENDER_PRIORITY 30
+// #define RENDER_PRIORITY 90
 /** Actually push to the screen. */
 #define SCREEN_PRIORITY 100
 /** For business logic. */

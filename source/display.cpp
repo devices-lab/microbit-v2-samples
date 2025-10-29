@@ -57,15 +57,10 @@ void update_display()
 {
     if (updated)
     {
-        DMESGF("W");
         buffer_lock.wait();
-        lcd->waitForSendDone();
-
         swap(buffers);
         lcd->sendIndexedImage(buffers[1], ST7735_WIDTH, ST7735_HEIGHT, palette);
-
         updated = false;
-        DMESGF("N");
         buffer_lock.notify();
     }
 }
@@ -102,4 +97,5 @@ void display_init()
         buffers[i] = new uint8_t[ST7735_WIDTH * ST7735_HEIGHT >> 1]();
     }
     updated = true;
+    update_display();
 }
