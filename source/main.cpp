@@ -1,14 +1,10 @@
 #include "MicroBit.h"
-#include "samples/Tests.h"
+#include "SSD1306.h"
 
 MicroBit uBit;
 
 int main()
 {
     uBit.init();
-
-    out_of_box_experience();
-
-    microbit_panic( 999 );
+    uBit.display.scroll("Hi :)");
 }
-

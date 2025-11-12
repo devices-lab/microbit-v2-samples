@@ -26,8 +26,31 @@ include(utils/cmake/JSONParser.cmake)
 include(utils/cmake/util.cmake)
 include(utils/cmake/colours.cmake)
 
+
+# Modifying CMakeLists.txt for SSD1306:
+
+# --- Add SSD1306 prebuilt driver (.obj + header) ---
+set(SSD1306_DIR "${CMAKE_CURRENT_LIST_DIR}/libraries/ssd1306-driver")
+
+# Include its headers
+list(APPEND INCLUDE_DIRS "${SSD1306_DIR}/inc")
+include_directories(${INCLUDE_DIRS})
+
+# Add the precompiled object file
+set(SSD1306_OBJ "${SSD1306_DIR}/obj/SSD1306.cpp.obj")
+
+if(NOT EXISTS "${SSD1306_OBJ}")
+  message(FATAL_ERROR "SSD1306 object not found: ${SSD1306_OBJ}")
+endif()
+
+list(APPEND SOURCE_FILES "${SSD1306_OBJ}")
+
+# --- END OF SSD1306 prebuilt driver (.obj + header) ---
+
+
+
 if (NOT "${BUILD_TOOL}" STRGREATER "")
-    set(BUILD_TOOL "CODAL")
+  set(BUILD_TOOL "CODAL")
 endif()
 
 #
@@ -45,15 +68,15 @@ set(CODAL_APP_OUTPUT_DIR ".")
 set(CODAL_APP_SOURCE_DIR "source")
 
 if("${codal.application}" STRGREATER "")
-    set(CODAL_APP_SOURCE_DIR "${codal.application}")
+  set(CODAL_APP_SOURCE_DIR "${codal.application}")
 endif()
 
 if("${codal.output_folder}" STRGREATER "")
-    set(CODAL_APP_OUTPUT_DIR "${codal.output_folder}")
+  set(CODAL_APP_OUTPUT_DIR "${codal.output_folder}")
 endif()
 
 if(NOT "${codal.target.name}" STRGREATER "")
-    message(FATAL_ERROR "${BoldRed}INVALID TARGET.${ColourReset}")
+  message(FATAL_ERROR "${BoldRed}INVALID TARGET.${ColourReset}")
 endif()
 
 set(CODAL_DEPS "")
@@ -65,11 +88,11 @@ message("${BoldMagenta}Set target: ${codal.target.name} ${ColourReset}")
 list(APPEND CODAL_DEPS ${codal.target.name})
 
 if("${codal.target.dev}" STRGREATER "")
-    file(READ "./${LIB_DEST}/${codal.target.name}/target.json" device_json)
-    message("${BoldMagenta}Using target.json (dev version) ${ColourReset}")
+  file(READ "./${LIB_DEST}/${codal.target.name}/target.json" device_json)
+  message("${BoldMagenta}Using target.json (dev version) ${ColourReset}")
 else()
-    file(READ "./${LIB_DEST}/${codal.target.name}/target-locked.json" device_json)
-    message("${BoldMagenta}Using target-locked.json${ColourReset}")
+  file(READ "./${LIB_DEST}/${codal.target.name}/target-locked.json" device_json)
+  message("${BoldMagenta}Using target-locked.json${ColourReset}")
 endif()
 
 message("${BoldBlue}Targeting ${codal.target.name}${ColourReset}")
@@ -83,13 +106,13 @@ SET(CODAL_TARGET_CPU_ARCHITECTURE ${device.architecture})
 
 # if this is the first build, lets copy a sample main.cpp from the target if available.
 if(NOT EXISTS ${CMAKE_CURRENT_LIST_DIR}/${CODAL_APP_SOURCE_DIR} AND EXISTS ${CMAKE_CURRENT_LIST_DIR}/${LIB_DEST}/${codal.target.name}/samples/main.cpp)
-    FILE(COPY ${CMAKE_CURRENT_LIST_DIR}/${LIB_DEST}/${codal.target.name}/samples/main.cpp DESTINATION ${CMAKE_CURRENT_LIST_DIR}/${CODAL_APP_SOURCE_DIR})
+  FILE(COPY ${CMAKE_CURRENT_LIST_DIR}/${LIB_DEST}/${codal.target.name}/samples/main.cpp DESTINATION ${CMAKE_CURRENT_LIST_DIR}/${CODAL_APP_SOURCE_DIR})
 endif()
 
 #copy samples and remove main.cpp
 if(NOT EXISTS ${CMAKE_CURRENT_LIST_DIR}/samples AND EXISTS ${CMAKE_CURRENT_LIST_DIR}/${LIB_DEST}/${codal.target.name}/samples/)
-    FILE(COPY ${CMAKE_CURRENT_LIST_DIR}/${LIB_DEST}/${codal.target.name}/samples DESTINATION ${CMAKE_CURRENT_LIST_DIR})
-    FILE(REMOVE ${CMAKE_CURRENT_LIST_DIR}/samples/main.cpp)
+  FILE(COPY ${CMAKE_CURRENT_LIST_DIR}/${LIB_DEST}/${codal.target.name}/samples DESTINATION ${CMAKE_CURRENT_LIST_DIR})
+  FILE(REMOVE ${CMAKE_CURRENT_LIST_DIR}/samples/main.cpp)
 endif()
 
 ####################
@@ -124,66 +147,66 @@ FORM_DEFINITIONS(FINAL_FIELDS FINAL_VALUES CODAL_DEFINITIONS)
 # extract any CMAKE definitions specified in the target.json object, and set as native cmake vars
 # cmake definitions require special handling as types are not safe in cmake, any semi-colon would need escaped, which would be ugly.
 foreach(var ${device})
-    #if it is not prefixed by codal.cmake_definitions, do not consider the key.		 +
-    if(NOT "${var}" MATCHES "device\.cmake_definitions\.")
-        continue()
-    endif()
+  #if it is not prefixed by codal.cmake_definitions, do not consider the key.		 +
+  if(NOT "${var}" MATCHES "device\.cmake_definitions\.")
+    continue()
+  endif()
 
-    string(REGEX MATCH "[^device\.cmake_definitions\.]([A-Z,a-z,0-9,_,]+)" CODAL_CMAKE_DEFINITION "${var}")
+  string(REGEX MATCH "[^device\.cmake_definitions\.]([A-Z,a-z,0-9,_,]+)" CODAL_CMAKE_DEFINITION "${var}")
 
-    set(${CODAL_CMAKE_DEFINITION} ${${var}})
+  set(${CODAL_CMAKE_DEFINITION} ${${var}})
 endforeach()
 
 #define any additional symbols specified by the target.
 if("${device.definitions}" STRGREATER "")
-    add_definitions("${device.definitions}")
+  add_definitions("${device.definitions}")
 endif()
 
 ####################
 # optional JSON flags for compilation + assembly
 ###################
 if("${device.cpu_opts}" STRGREATER "")
-    set(_CPU_COMPILATION_OPTIONS "${device.cpu_opts}")
-    set(CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS} ${device.cpu_opts}")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${device.cpu_opts}")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${device.cpu_opts}")
-    set(CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} ${device.cpu_opts}")
+  set(_CPU_COMPILATION_OPTIONS "${device.cpu_opts}")
+  set(CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS} ${device.cpu_opts}")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${device.cpu_opts}")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${device.cpu_opts}")
+  set(CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} ${device.cpu_opts}")
 endif()
 
 set(_C_FAMILY_FLAGS_INIT "-fno-exceptions -fno-unwind-tables -ffunction-sections -fdata-sections -Wall -Wextra -Wno-unused-parameter")
 
 # asm
 if("${device.asm_flags}" STRGREATER "")
-    set(CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS} ${device.asm_flags}")
+  set(CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS} ${device.asm_flags}")
 endif()
 
 # c
 if("${device.c_flags}" STRGREATER "")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${_C_FAMILY_FLAGS_INIT} ${device.c_flags}")
-    set(CMAKE_C_LINK_FLAGS "${CMAKE_C_LINK_FLAGS} ${device.c_flags}")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${_C_FAMILY_FLAGS_INIT} ${device.c_flags}")
+  set(CMAKE_C_LINK_FLAGS "${CMAKE_C_LINK_FLAGS} ${device.c_flags}")
 endif()
 
 # cpp
 if("${device.cpp_flags}" STRGREATER "")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_C_FAMILY_FLAGS_INIT} ${device.cpp_flags}")
-    set(CMAKE_CXX_LINK_FLAGS "${device.cpp_flags}")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_C_FAMILY_FLAGS_INIT} ${device.cpp_flags}")
+  set(CMAKE_CXX_LINK_FLAGS "${device.cpp_flags}")
 endif()
 
 # linker opts
 if("${device.linker_flags}" STRGREATER "")
-    set(CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} ${device.linker_flags}")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${device.linker_flags}")
+  set(CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} ${device.linker_flags}")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${device.linker_flags}")
 endif()
 
 # create a header file from the definitions specified in JSON
 if("${CODAL_DEFINITIONS}" STRGREATER "")
-    set(EXTRA_INCLUDES_NEW_PATH "${PROJECT_SOURCE_DIR}/build/codal_extra_definitions_new.h")
-    set(EXTRA_INCLUDES_PATH "${PROJECT_SOURCE_DIR}/build/codal_extra_definitions.h")
-    file(WRITE "${EXTRA_INCLUDES_NEW_PATH}" ${CODAL_DEFINITIONS})
-    configure_file(${EXTRA_INCLUDES_NEW_PATH} ${EXTRA_INCLUDES_PATH} COPYONLY)
+  set(EXTRA_INCLUDES_NEW_PATH "${PROJECT_SOURCE_DIR}/build/codal_extra_definitions_new.h")
+  set(EXTRA_INCLUDES_PATH "${PROJECT_SOURCE_DIR}/build/codal_extra_definitions.h")
+  file(WRITE "${EXTRA_INCLUDES_NEW_PATH}" ${CODAL_DEFINITIONS})
+  configure_file(${EXTRA_INCLUDES_NEW_PATH} ${EXTRA_INCLUDES_PATH} COPYONLY)
 
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -include \"${EXTRA_INCLUDES_PATH}\"")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -include \"${EXTRA_INCLUDES_PATH}\"")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -include \"${EXTRA_INCLUDES_PATH}\"")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -include \"${EXTRA_INCLUDES_PATH}\"")
 endif()
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -I\"${PLATFORM_INCLUDES_PATH}\"")
@@ -206,28 +229,28 @@ include_directories(${PROJECT_SOURCE_DIR}/${LIB_DEST})
 
 # "import" and add any specified libraries to the build list
 if("${device.libraries}" STRGREATER "")
-    message("Installing dependencies...")
-    set(DEVICE_LIBS ${device.libraries})
+  message("Installing dependencies...")
+  set(DEVICE_LIBS ${device.libraries})
 
-    foreach(i ${DEVICE_LIBS})
-        SET(BRANCH "NONE")
-        SET(URL "${device.libraries_${i}.url}")
-        if("${device.libraries_${i}.branch}" STRGREATER "")
-            SET(BRANCH "${device.libraries_${i}.branch}")
-        endif()
-        if("${codal.target.branches.${URL}}" STRGREATER "")
-            SET(BRANCH "${codal.target.branches.${URL}}")
-            MESSAGE (STATUS "Override branch: ${BRANCH}")
-        endif()
+  foreach(i ${DEVICE_LIBS})
+    SET(BRANCH "NONE")
+    SET(URL "${device.libraries_${i}.url}")
+    if("${device.libraries_${i}.branch}" STRGREATER "")
+      SET(BRANCH "${device.libraries_${i}.branch}")
+    endif()
+    if("${codal.target.branches.${URL}}" STRGREATER "")
+      SET(BRANCH "${codal.target.branches.${URL}}")
+      MESSAGE (STATUS "Override branch: ${BRANCH}")
+    endif()
 
-        INSTALL_DEPENDENCY(${LIB_DEST} ${device.libraries_${i}.name} ${URL} ${BRANCH} ${device.libraries_${i}.type})
-        list(APPEND CODAL_DEPS "${device.libraries_${i}.name}")
-    endforeach()
+    INSTALL_DEPENDENCY(${LIB_DEST} ${device.libraries_${i}.name} ${URL} ${BRANCH} ${device.libraries_${i}.type})
+    list(APPEND CODAL_DEPS "${device.libraries_${i}.name}")
+  endforeach()
 
-    foreach(dep ${CODAL_DEPS})
-        message("${BoldGreen}Using library: ${dep}${ColourReset}")
-        add_subdirectory("${PROJECT_SOURCE_DIR}/${LIB_DEST}/${dep}")
-    endforeach()
+  foreach(dep ${CODAL_DEPS})
+    message("${BoldGreen}Using library: ${dep}${ColourReset}")
+    add_subdirectory("${PROJECT_SOURCE_DIR}/${LIB_DEST}/${dep}")
+  endforeach()
 endif()
 
 #finally, find sources and includes of the application, and create a target.
@@ -245,19 +268,19 @@ list(APPEND SOURCE_FILES ${C_FILES})
 list(APPEND SOURCE_FILES ${CC_FILES})
 
 if("${SOURCE_FILES}" STREQUAL "")
-    message(FATAL_ERROR "${BoldRed}No user application to build, please add a main.cpp at: ${PROJECT_SOURCE_DIR}/${CODAL_APP_SOURCE_DIR}${ColourReset}")
+  message(FATAL_ERROR "${BoldRed}No user application to build, please add a main.cpp at: ${PROJECT_SOURCE_DIR}/${CODAL_APP_SOURCE_DIR}${ColourReset}")
 endif()
 
 if ("${BUILD_TOOL}" STRGREATER "")
-    string(COMPARE EQUAL "${BUILD_TOOL}" "YOTTA" YOTTA_BUILD)
-    if (${YOTTA_BUILD})
-        include("${PROJECT_SOURCE_DIR}/utils/cmake/buildtools/yotta.cmake")
-    endif ()
+  string(COMPARE EQUAL "${BUILD_TOOL}" "YOTTA" YOTTA_BUILD)
+  if (${YOTTA_BUILD})
+    include("${PROJECT_SOURCE_DIR}/utils/cmake/buildtools/yotta.cmake")
+  endif ()
 
-    string(COMPARE EQUAL "${BUILD_TOOL}" "CODAL" CODAL_BUILD)
-    if (${CODAL_BUILD})
-        include("${PROJECT_SOURCE_DIR}/utils/cmake/buildtools/codal.cmake")
-    endif()
+  string(COMPARE EQUAL "${BUILD_TOOL}" "CODAL" CODAL_BUILD)
+  if (${CODAL_BUILD})
+    include("${PROJECT_SOURCE_DIR}/utils/cmake/buildtools/codal.cmake")
+  endif()
 endif()
 
 #
