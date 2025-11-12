@@ -27,8 +27,8 @@ include(utils/cmake/util.cmake)
 include(utils/cmake/colours.cmake)
 
 
+# NOTE:
 # Modifying CMakeLists.txt for SSD1306:
-
 # --- Add SSD1306 prebuilt driver (.obj + header) ---
 set(SSD1306_DIR "${CMAKE_CURRENT_LIST_DIR}/libraries/ssd1306-driver")
 
@@ -45,8 +45,8 @@ endif()
 
 list(APPEND SOURCE_FILES "${SSD1306_OBJ}")
 
+# NOTE:
 # --- END OF SSD1306 prebuilt driver (.obj + header) ---
-
 
 
 if (NOT "${BUILD_TOOL}" STRGREATER "")
@@ -173,7 +173,7 @@ if("${device.cpu_opts}" STRGREATER "")
   set(CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} ${device.cpu_opts}")
 endif()
 
-set(_C_FAMILY_FLAGS_INIT "-fno-exceptions -fno-unwind-tables -ffunction-sections -fdata-sections -Wall -Wextra -Wno-unused-parameter")
+set(_C_FAMILY_FLAGS_INIT "-fno-exceptions -fno-unwind-tables -ffunction-sections -fdata-sections -Wall -Wextra -Wno-unused-parameter -Werror=return-type") # NOTE: ADDED -Werror=return-type
 
 # asm
 if("${device.asm_flags}" STRGREATER "")
