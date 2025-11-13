@@ -30,20 +30,16 @@ include(utils/cmake/colours.cmake)
 # NOTE:
 # Modifying CMakeLists.txt for SSD1306:
 # --- Add SSD1306 prebuilt driver (.obj + header) ---
-set(SSD1306_DIR "${CMAKE_CURRENT_LIST_DIR}/libraries/ssd1306-driver")
 
-# Include its headers
+set(SSD1306_DIR "${CMAKE_CURRENT_LIST_DIR}/libraries/ssd1306-driver")
 list(APPEND INCLUDE_DIRS "${SSD1306_DIR}/inc")
 include_directories(${INCLUDE_DIRS})
 
-# Add the precompiled object file
 set(SSD1306_OBJ "${SSD1306_DIR}/obj/SSD1306.cpp.obj")
 
 if(NOT EXISTS "${SSD1306_OBJ}")
   message("SSD1306 object not found: ${SSD1306_OBJ}")
 endif()
-
-list(APPEND SOURCE_FILES "${SSD1306_OBJ}")
 
 # NOTE:
 # --- END OF SSD1306 prebuilt driver (.obj + header) ---
@@ -195,7 +191,7 @@ endif()
 # linker opts
 if("${device.linker_flags}" STRGREATER "")
   set(CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} ${device.linker_flags}")
-  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${device.linker_flags}")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${device.linker_flags} ${SSD1306_OBJ}")
 endif()
 
 # create a header file from the definitions specified in JSON
