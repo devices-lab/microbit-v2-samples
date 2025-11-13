@@ -27,26 +27,26 @@ include(utils/cmake/util.cmake)
 include(utils/cmake/colours.cmake)
 
 
-# # NOTE:
-# # Modifying CMakeLists.txt for SSD1306:
-# # --- Add SSD1306 prebuilt driver (.obj + header) ---
-# set(SSD1306_DIR "${CMAKE_CURRENT_LIST_DIR}/libraries/ssd1306-driver")
+# NOTE:
+# Modifying CMakeLists.txt for SSD1306:
+# --- Add SSD1306 prebuilt driver (.obj + header) ---
+set(SSD1306_DIR "${CMAKE_CURRENT_LIST_DIR}/libraries/ssd1306-driver")
 
-# # Include its headers
-# list(APPEND INCLUDE_DIRS "${SSD1306_DIR}/inc")
-# include_directories(${INCLUDE_DIRS})
+# Include its headers
+list(APPEND INCLUDE_DIRS "${SSD1306_DIR}/inc")
+include_directories(${INCLUDE_DIRS})
 
-# # Add the precompiled object file
-# set(SSD1306_OBJ "${SSD1306_DIR}/obj/SSD1306.cpp.obj")
+# Add the precompiled object file
+set(SSD1306_OBJ "${SSD1306_DIR}/obj/SSD1306.cpp.obj")
 
-# if(NOT EXISTS "${SSD1306_OBJ}")
-#   message("SSD1306 object not found: ${SSD1306_OBJ}")
-# endif()
+if(NOT EXISTS "${SSD1306_OBJ}")
+  message("SSD1306 object not found: ${SSD1306_OBJ}")
+endif()
 
-# list(APPEND SOURCE_FILES "${SSD1306_OBJ}")
+list(APPEND SOURCE_FILES "${SSD1306_OBJ}")
 
-# # NOTE:
-# # --- END OF SSD1306 prebuilt driver (.obj + header) ---
+# NOTE:
+# --- END OF SSD1306 prebuilt driver (.obj + header) ---
 
 
 if (NOT "${BUILD_TOOL}" STRGREATER "")
