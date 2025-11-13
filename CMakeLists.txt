@@ -40,7 +40,7 @@ include_directories(${INCLUDE_DIRS})
 set(SSD1306_OBJ "${SSD1306_DIR}/obj/SSD1306.cpp.obj")
 
 if(NOT EXISTS "${SSD1306_OBJ}")
-  message(FATAL_ERROR "SSD1306 object not found: ${SSD1306_OBJ}")
+  message("SSD1306 object not found: ${SSD1306_OBJ}")
 endif()
 
 list(APPEND SOURCE_FILES "${SSD1306_OBJ}")
