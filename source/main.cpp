@@ -71,7 +71,7 @@ int main()
 
         // Task 2: print all 6 axes of the LSM over serial:
         // The first axis is provided but this code will just
-        // print 0 and/or won't change as you move it until you have
+        // a messed up number and/or won't change as you move it until you have
         // fixed the LOOK_AT_THE_DATASHEET issues in LSM6DSL.cpp
         //
         // Uncomment for Task 2:

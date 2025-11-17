@@ -1,7 +1,7 @@
 #include "MicroBit.h"
 #include "math.h"
 
-// Page 60
+// Page 48 and 60 may be of particular interest.
 // https://www.lcsc.com/datasheet/C126672.pdf
 
 extern MicroBit uBit;
