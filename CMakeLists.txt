@@ -191,7 +191,7 @@ endif()
 # linker opts
 if("${device.linker_flags}" STRGREATER "")
   set(CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} ${device.linker_flags}")
-  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${device.linker_flags} ${SSD1306_OBJ}")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${device.linker_flags}")
 endif()
 
 # create a header file from the definitions specified in JSON
@@ -277,6 +277,19 @@ if ("${BUILD_TOOL}" STRGREATER "")
   if (${CODAL_BUILD})
     include("${PROJECT_SOURCE_DIR}/utils/cmake/buildtools/codal.cmake")
   endif()
+  
+  # NOTE:
+  # Modifying CMakeLists.txt for SSD1306:
+  # --- Add SSD1306 prebuilt driver (.obj + header) ---
+
+  set_source_files_properties("${SSD1306_OBJ}"
+    PROPERTIES
+      EXTERNAL_OBJECT TRUE
+      GENERATED TRUE)
+  target_sources(MICROBIT PRIVATE "${SSD1306_OBJ}")
+
+  # NOTE:
+  # --- END OF SSD1306 prebuilt driver (.obj + header) ---
 endif()
 
 #
